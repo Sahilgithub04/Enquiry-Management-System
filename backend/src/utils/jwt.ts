@@ -1,16 +1,24 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 export interface TokenPayload {
   userId: string;
   role: string;
 }
 
+const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error("JWT_SECRET environment variable is not configured");
+  }
+
+  return secret;
+};
+
 export const generateToken = (payload: TokenPayload): string => {
-  const secret = process.env.JWT_SECRET || 'cloudblitz_super_secret_jwt_key_2026';
-  return jwt.sign(payload, secret, { expiresIn: '24h' });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: "24h" });
 };
 
 export const verifyToken = (token: string): TokenPayload => {
-  const secret = process.env.JWT_SECRET || 'cloudblitz_super_secret_jwt_key_2026';
-  return jwt.verify(token, secret) as TokenPayload;
+  return jwt.verify(token, getJwtSecret()) as TokenPayload;
 };
